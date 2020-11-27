@@ -1,12 +1,16 @@
-
 import express from "express";
-
 import { createServer } from "http";
-// import createRoutes from "./core/route";
 import mongoose from "mongoose";
 import config from "config";
-// import createSocket from "./core/socket";
-
+import createSocket from "./core/socket";
+import { UserController } from "./controllers/UserController";
+import { DialogController } from "./controllers/DialogController";
+import { MessageController } from "./controllers/MessageController";
+import cors from "cors";
+import bodyParser from "body-parser";
+import { checkAuth } from "./middlewares/checkAuth";
+import { validateRegister } from "./utils/validation/registration";
+import { validateLogin } from "./utils/validation/login";
 
 
 mongoose
@@ -21,11 +25,25 @@ mongoose
 
 const app = express();
 const http = createServer(app);
-// const io = createSocket(http);
-//
-// createRoutes(app, io);
+
+console.log(createSocket(http));
+const userControls = new UserController();
+const dialogControls = new DialogController();
+const messageController = new MessageController(createSocket(http))
+app.use(cors());
+app.use(bodyParser.json());
+app.use(checkAuth);
+
+app.post("/user/signup", validateRegister, userControls.create);
+app.post("/user/signin", validateLogin, userControls.login);
+
+app.post('/dialog/create', dialogControls.create)
+app.get("/dialog/get", dialogControls.getDialogs)
+
+app.post("/message/add", messageController.create)
 
 const PORT: number = config.get('port');
+// config.get('baseUrl')
 
 http.listen(PORT, function () {
   console.log(`Server: http://localhost:${PORT}`);

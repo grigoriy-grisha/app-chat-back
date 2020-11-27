@@ -1,7 +1,7 @@
 {
-  "port": 5000,
-  "jwtSecret": "IEasd[']!@#{S12]';1",
-  "mongoUri": "mongodb://localhost:27017/?readPreference=primary&ssl=false",
-  "baseUrl": "http://localhost:5000",
-  "live": "10h"
+    "port": 5000,
+    "jwtSecret": "v1=-2^a?sadALE<V:D@$a1/a12QA1",
+    "mongoUri": "mongodb://localhost:27017/?readPreference=primary&ssl=false",
+    "baseUrl": "http://localhost:5000",
+    "live": "10h"
 }
