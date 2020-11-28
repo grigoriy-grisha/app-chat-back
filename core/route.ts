@@ -3,24 +3,23 @@ import express from "express";
 import cors from "cors";
 import socket from "socket.io";
 
-import { UserController } from "../controllers/UserController";
-import { DialogController } from "../controllers/DialogController";
+import {DialogController} from "../controllers/DialogController";
 
-import { validateRegister } from "../utils/validation/registration";
-import { validateLogin } from "../utils/validation/login";
+import {checkAuth} from "../middlewares/checkAuth";
+import {MessageController} from "../controllers/MessageController";
+import {validateRegister} from "../utils/validation/registration";
+import {validateLogin} from "../utils/validation/login";
+import {UserController} from "../controllers/UserController";
+import {RedirectController} from "../controllers/RedirectController";
 
-import { checkAuth } from "../middlewares/checkAuth";
-import { MessageController } from "../controllers/MessageController";
 
-export default (app: express.Express, io: socket.Server) => {
-  console.log(io);
+export const createRoute = (app: express.Express, io: socket.Server) => {
+
   const userControls = new UserController();
   const dialogControls = new DialogController();
+  const redirectController = new RedirectController()
   const messageController = new MessageController(io);
 
-  app.use(cors());
-  app.use(bodyParser.json());
-  app.use(checkAuth);
 
   app.post("/user/signup", validateRegister, userControls.create);
   app.post("/user/signin", validateLogin, userControls.login);
@@ -29,4 +28,6 @@ export default (app: express.Express, io: socket.Server) => {
   app.get("/dialog/get", dialogControls.getDialogs);
 
   app.post("/message/add", messageController.create);
+
+  app.post('/append/:id', redirectController.redirect)
 };

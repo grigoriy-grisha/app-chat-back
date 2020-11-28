@@ -2,16 +2,12 @@ import express from "express";
 import { createServer } from "http";
 import mongoose from "mongoose";
 import config from "config";
-import createSocket from "./core/socket";
-import { UserController } from "./controllers/UserController";
-import { DialogController } from "./controllers/DialogController";
-import { MessageController } from "./controllers/MessageController";
+//TODO сделать адекватное добавление пользователя
+import {createRoute} from "./core/route";
+import {createSocket} from "./core/socket";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { checkAuth } from "./middlewares/checkAuth";
-import { validateRegister } from "./utils/validation/registration";
-import { validateLogin } from "./utils/validation/login";
-
+import {checkAuth} from "./middlewares/checkAuth";
 
 mongoose
   .connect(config.get("mongoUri"), {
@@ -24,23 +20,28 @@ mongoose
   .catch((err) => console.log(err));
 
 const app = express();
-const http = createServer(app);
 
-console.log(createSocket(http));
-const userControls = new UserController();
-const dialogControls = new DialogController();
-const messageController = new MessageController(createSocket(http))
+
+
+const http = createServer(app);
+const io = createSocket(http);
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(checkAuth);
+export let req: express.Request
+export let res: express.Response
+app.use((request: express.Request, response: express.Response, next:express.NextFunction) => {
+  req = request
+  res = response
+  next()
+})
 
-app.post("/user/signup", validateRegister, userControls.create);
-app.post("/user/signin", validateLogin, userControls.login);
+createRoute(app, io)
 
-app.post('/dialog/create', dialogControls.create)
-app.get("/dialog/get", dialogControls.getDialogs)
 
-app.post("/message/add", messageController.create)
+
+
 
 const PORT: number = config.get('port');
 // config.get('baseUrl')

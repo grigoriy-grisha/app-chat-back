@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, {Schema, Document} from "mongoose";
 
 
 export interface IDialog extends Document {
@@ -21,7 +21,13 @@ const DialogSchema: Schema = new Schema(
     users: [{
       type: Schema.Types.ObjectId,
       ref: "User"
-    }]
+    }],
+    link: {
+      type: Schema.Types.ObjectId,
+      ref: "Link"
+    },
+    lastMessage: {type: String},
+    protected: {type: Boolean},
   },
   {
     timestamps: true

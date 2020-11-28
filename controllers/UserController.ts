@@ -1,12 +1,12 @@
 import { createJWToken } from "./../utils/createJWToken";
 import { IUser } from "./../models/User";
-import express from "express";
 import bcrypt from "bcrypt";
 import { validationResult } from "express-validator";
 import { UserModel } from "../models/User";
+import {req, res} from "../index";
 
 export class UserController {
-  create = async (req: express.Request, res: express.Response) => {
+  create = async () => {
     const { email, fullname, password } = req.body;
 
     const errors = validationResult(req);
@@ -18,7 +18,7 @@ export class UserController {
       res.status(422).json({ errors: errors.array() });
     } else {
       const hashedPassword = await bcrypt.hash(password, 12);
-      const user = await new UserModel({
+      const user = new UserModel({
         email,
         fullname,
         password: hashedPassword,
@@ -28,7 +28,7 @@ export class UserController {
       res.json({ message: "Пользователь создан" });
     }
   };
-  login = (req: express.Request, res: express.Response): void => {
+  login = (): void => {
     const { email, password } = req.body;
 
     const errors = validationResult(req);

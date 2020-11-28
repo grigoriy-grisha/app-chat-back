@@ -2,11 +2,12 @@ import express from "express";
 import { MessageModel } from "../models/Message";
 import { UserModel } from "../models/User";
 import socket from "socket.io";
+import {req, res} from "../index";
 
 export class MessageController {
   constructor(private io: socket.Server) {}
 
-  create = async (req: express.Request, res: express.Response) => {
+  create = async () => {
     const { dialog, text } = req.body;
     const author = req.user;
 

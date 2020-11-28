@@ -1,11 +1,13 @@
 import express from "express";
 import { DialogModel } from "../models/Dialog";
 import { UserModel } from "../models/User";
+import {req, res} from "../index";
+import {linkService} from "../services/LinkService";
 
 export class DialogController {
-  create = async (req: express.Request, res: express.Response) => {
+  create = async () => {
     const { name } = req.body;
-    const author = req.user!;
+    const author: any = req.user!;
 
     const dialog = await new DialogModel({ name, author });
     await dialog.users.push(author);
@@ -15,11 +17,13 @@ export class DialogController {
     await user!.dialogs.push(dialog._id);
     await user!.save();
 
-    res.json(dialog);
+    await linkService.create(dialog._id)
+
+    res.json({dialog});
   };
 
 
-  getDialogs = async (req: express.Request, res: express.Response) => {
+  getDialogs = async () => {
     const author = req.user!;
 
     await UserModel.findById(author)
