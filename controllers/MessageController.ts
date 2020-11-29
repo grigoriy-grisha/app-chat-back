@@ -1,29 +1,34 @@
 import express from "express";
-import { MessageModel } from "../models/Message";
-import { UserModel } from "../models/User";
 import socket from "socket.io";
 import {req, res} from "../index";
+import {messageService} from "../services/MessageService";
 
 export class MessageController {
-  constructor(private io: socket.Server) {}
+  constructor(private io: socket.Server) {
+  }
 
   create = async () => {
-    const { dialog, text } = req.body;
-    const author = req.user;
+    try {
+      const {dialog, text} = req.body;
+      const author: any = req.user;
+      const io = this.io
+      const userFound = await messageService.checkDialogsUser(dialog, author)
 
-    const message = new MessageModel({ dialog, text, author });
-    await message.save();
+      !userFound
+        ? res.status(404).json({message: "Пользователь не состоит в диалоге!"})
+        : await messageService.create({author, dialog, text, io})
+    } catch (e) {
+      res.status(500).json({message: "Что-то пошло не так!"})
+    }
 
-    await UserModel.findById(author).exec((err, user) => {
-      if (err) {
-        return res.status(404).json({
-          status: "error",
-          message: "Dialog not found",
-        });
-      }
-      this.io.emit("SERVER:NEW_MESSAGE", { user, message });
-    });
+  };
 
-    res.json({ message: "Сообщение создано", messages: message });
+
+  index = async () => {
+    const dialogId: string =
+      req.query && req.query.dialog ? (req.query as any).dialog : "";
+
+    await messageService.getMessage(dialogId)
+
   };
 }

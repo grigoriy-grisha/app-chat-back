@@ -8,6 +8,8 @@ import {createSocket} from "./core/socket";
 import cors from "cors";
 import bodyParser from "body-parser";
 import {checkAuth} from "./middlewares/checkAuth";
+import {RedirectController} from "./controllers/RedirectController";
+import cookieParser from "cookie-parser";
 
 mongoose
   .connect(config.get("mongoUri"), {
@@ -28,14 +30,19 @@ const io = createSocket(http);
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(cookieParser('as'))
 app.use(checkAuth);
+
 export let req: express.Request
 export let res: express.Response
+
 app.use((request: express.Request, response: express.Response, next:express.NextFunction) => {
   req = request
   res = response
   next()
 })
+
+
 
 createRoute(app, io)
 

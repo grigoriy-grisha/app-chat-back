@@ -8,7 +8,8 @@ export const checkAuth = (
 ): void => {
   if (
     req.path === "/user/signin" ||
-    req.path === "/user/signup"
+    req.path === "/user/signup" ||
+    req.path.match(/append/)
   ) {
     return next();
   }

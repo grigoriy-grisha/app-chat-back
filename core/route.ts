@@ -5,19 +5,20 @@ import socket from "socket.io";
 
 import {DialogController} from "../controllers/DialogController";
 
-import {checkAuth} from "../middlewares/checkAuth";
 import {MessageController} from "../controllers/MessageController";
 import {validateRegister} from "../utils/validation/registration";
 import {validateLogin} from "../utils/validation/login";
 import {UserController} from "../controllers/UserController";
 import {RedirectController} from "../controllers/RedirectController";
+import {LinkController} from "../controllers/LinkController";
 
 
 export const createRoute = (app: express.Express, io: socket.Server) => {
 
   const userControls = new UserController();
+  const linkController = new LinkController();
   const dialogControls = new DialogController();
-  const redirectController = new RedirectController()
+  const redirectController = new RedirectController();
   const messageController = new MessageController(io);
 
 
@@ -26,8 +27,13 @@ export const createRoute = (app: express.Express, io: socket.Server) => {
 
   app.post("/dialog/create", dialogControls.create);
   app.get("/dialog/get", dialogControls.getDialogs);
+  app.post("/dialog/userAdd", dialogControls.addUser)
 
   app.post("/message/add", messageController.create);
+  app.get("/message/get", messageController.index);
 
-  app.post('/append/:id', redirectController.redirect)
+  app.get('/append/:id', redirectController.redirect)
+
+  app.get('/redirect', linkController.redirect)
+
 };

@@ -1,15 +1,16 @@
 import express from "express";
-import { DialogModel } from "../models/Dialog";
-import { UserModel } from "../models/User";
+import {DialogModel} from "../models/Dialog";
+import {UserModel} from "../models/User";
 import {req, res} from "../index";
 import {linkService} from "../services/LinkService";
+import {dialogService} from "../services/DialogService";
 
 export class DialogController {
   create = async () => {
-    const { name } = req.body;
+    const {name} = req.body;
     const author: any = req.user!;
 
-    const dialog = await new DialogModel({ name, author });
+    const dialog = await new DialogModel({name, author});
     await dialog.users.push(author);
     await dialog.save();
 
@@ -39,4 +40,15 @@ export class DialogController {
         res.json(user);
       });
   };
+
+  async addUser() {
+    try {
+      const {user, dialog} = req.body;
+      const author = req.user!;
+      await dialogService.addUser(user, dialog, author)
+      res.status(200).json({message: "Пользователь добавлен"})
+    } catch (e) {
+      res.status(500).json({message: e})
+    }
+  }
 }

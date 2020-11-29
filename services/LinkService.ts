@@ -23,7 +23,6 @@ class LinkService {
       if (!dialog) throw Error()
 
       await dialog.save()
-      return link
     } catch (e) {
       res.status(500).json({message: 'Что-то пошло не так, попробуйте снова'})
     }
