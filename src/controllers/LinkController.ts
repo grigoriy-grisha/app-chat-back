@@ -1,8 +1,8 @@
 import {UserModel} from "../models/User";
-import {req, res} from "../index";
+import express from "express";
 
 export class LinkController {
-  async redirect() {
+  async redirect(req: express.Request, res: express.Response) {
 
     const user = await UserModel.findById(req.user)
     console.log(req.user)

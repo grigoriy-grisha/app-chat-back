@@ -3,5 +3,6 @@
     "jwtSecret": "v1=-2^a?sadALE<V:D@$a1/a12QA1",
     "mongoUri": "mongodb://localhost:27017/?readPreference=primary&ssl=false",
     "baseUrl": "http://localhost:5000",
-    "live": "10h"
+    "live": "10h",
+    "clientUrl": "http://localhost:3000"
 }

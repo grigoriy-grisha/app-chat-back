@@ -1,5 +1,4 @@
 import jwt, { VerifyErrors } from "jsonwebtoken";
-// import { IUser } from "../models/User";
 import config from 'config'
 export interface DecodedData {
   data: string
@@ -20,8 +19,6 @@ export default (token: string): Promise<DecodedData | null> =>
           if (err || !decodedData) {
             return reject(err);
           }
-          
-          
           resolve(decodedData as DecodedData);
         }
       )

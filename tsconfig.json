@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -10,10 +11,13 @@
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true
+    "isolatedModules": false,
+
   },
   "files": ["types.d.ts", "./node_modules/@types/node/index.d.ts"],
-  "include": ["src/**/*.ts", "types.d.ts", "db.ts", "index.ts"],
+  "include": ["src/**/*.ts", "types.d.ts", "db.ts",
+    "src/index.ts"
+  ],
   "exclude": ["node_modules"],
   "typeRoots": ["./node_modules/@types"]
 }
