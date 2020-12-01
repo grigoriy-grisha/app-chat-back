@@ -1,9 +1,9 @@
 import express from "express";
-import { createServer } from "http";
+import {createServer} from "http";
 import mongoose from "mongoose";
 import config from "config";
-import { createRoute } from "./core/route";
-import { createSocket } from "./core/socket";
+import {createRoute} from "./core/route";
+import {createSocket} from "./core/socket";
 
 mongoose
   .connect(config.get("mongoUri"), {
@@ -20,7 +20,7 @@ const app = express();
 const http = createServer(app);
 export const io = createSocket(http);
 
-createRoute(app);
+createRoute(app, io);
 
 const PORT: number = config.get("port");
 

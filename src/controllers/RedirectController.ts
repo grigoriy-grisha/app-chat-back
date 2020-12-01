@@ -6,6 +6,8 @@ export class RedirectController {
     try {
       const dialogId = req.params.id;
       const redirectUrl = await redirectService.redirect(dialogId);
+      res.cookie('redirect', true);
+      res.cookie('dialogId', dialogId);
       res.redirect(redirectUrl);
     } catch (e) {
       res

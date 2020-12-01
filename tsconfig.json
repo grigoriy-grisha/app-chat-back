@@ -14,8 +14,8 @@
     "isolatedModules": false,
 
   },
-  "files": ["types.d.ts", "./node_modules/@types/node/index.d.ts"],
-  "include": ["src/**/*.ts", "types.d.ts", "db.ts",
+  "files": ["./types.d.ts", "./node_modules/@types/node/index.d.ts"],
+  "include": ["src/**/*.ts", "./types.d.ts", "db.ts",
     "src/index.ts"
   ],
   "exclude": ["node_modules"],

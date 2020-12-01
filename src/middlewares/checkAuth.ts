@@ -17,12 +17,12 @@ export const checkAuth = (
   if (req.method === "OPTIONS") {
     return next();
   }
-
+  console.log(req.headers.authorization?.split(" "))
   const token: string | null | undefined = "authorization" in req.headers
-    ? req.headers.authorization?.split(" ")[1]  // "Bearer TOKEN"
+    ? req.headers.authorization?.split(" ")[1]
     : null;
 
-  console.log(token);
+
   // const token: string | null= req.headers.authorization.split(' ')[1]
   if (token) {
     verifyJWTToken(token)
@@ -33,10 +33,10 @@ export const checkAuth = (
         next();
       })
       .catch(() => {
-        res.status(403).json({ message: "Invalid auth token provided." });
+        res.status(401).json({ message: "Invalid auth token provided." });
       });
   } else {
-    res.status(403).json({ message: "Invalid auth token provided." });
+    res.status(401).json({ message: "Invalid auth token provided." });
   }
 };
 

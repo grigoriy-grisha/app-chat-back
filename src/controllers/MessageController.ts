@@ -1,13 +1,13 @@
-import { messageService } from "../services/MessageService";
-import { requestDecorator } from "../requestDecorator";
-import { BaseRequestError } from "../BaseRquestError";
+import {messageService} from "../services/MessageService";
+import {requestDecorator} from "../requestDecorator";
+import {RequestInterface} from "../types";
 
-interface RequestInterface {
-  body: {
-    dialog: string;
-    text: string;
-  };
-}
+
+interface BodyInterface {
+  dialog: string;
+  text: string;
+};
+
 
 interface RequestInterfaceParams {
   params: {
@@ -15,29 +15,22 @@ interface RequestInterfaceParams {
   };
 }
 
-interface RequestUserInterface {
-  user: string;
-}
-
 export class MessageController {
-  constructor() {}
+
 
   @requestDecorator
   async create({
-    body: { dialog, text },
-    user: author,
-  }: RequestInterface & RequestUserInterface) {
-    const userFound = await messageService.checkDialogsUser(dialog, author);
-    if (!userFound)
-      throw new BaseRequestError("Пользователь не состоит в диалоге!", 403);
-    return await messageService.create({ author, dialog, text });
+                 body: {dialog, text},
+                 user: author,
+               }: RequestInterface<BodyInterface>) {
+    return await messageService.create({author, dialog, text});
   }
 
   @requestDecorator
   async get({
-    params: { id },
-    user: author,
-  }: RequestInterfaceParams & RequestUserInterface) {
+              params: {id},
+              user: author,
+            }: RequestInterfaceParams & RequestInterface<{}>) {
     return await messageService.getMessage(id, author);
   }
 }
