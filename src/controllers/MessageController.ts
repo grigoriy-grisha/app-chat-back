@@ -20,10 +20,11 @@ export class MessageController {
 
   @requestDecorator
   async create({
-                 body: {dialog, text},
+                 body: {text},
+                 params: {id},
                  user: author,
-               }: RequestInterface<BodyInterface>) {
-    return await messageService.create({author, dialog, text});
+               }: RequestInterface<BodyInterface> & RequestInterfaceParams) {
+    return await messageService.create({author, id, text});
   }
 
   @requestDecorator

@@ -20,7 +20,7 @@ const app = express();
 const http = createServer(app);
 export const io = createSocket(http);
 
-createRoute(app, io);
+createRoute(app);
 
 const PORT: number = config.get("port");
 

@@ -24,13 +24,17 @@ class DialogService {
     return user;
   }
 
-  async getAll() {
-    const dialogs = await DialogModel.find({});
+  async getAll(author: string) {
+    let dialogs: IDialog[] = await DialogModel.find({protect: {$ne: true}});
+    console.log(dialogs)
+    dialogs = dialogs.filter(item => {
+      return !item.users.includes(author)
+    })
     return {status: 200, dialogs};
   }
 
-  async addUserToDialog(name: string, author: string) {
-    const dialog = await new DialogModel({name, author});
+  async addUserToDialog(name: string, author: string, protect: boolean) {
+    const dialog = await new DialogModel({name, author, protect});
     await dialog.users.push(author);
     await dialog.save();
 
@@ -40,9 +44,10 @@ class DialogService {
   }
 
 
-  async addUserRedirect(user: string, dialog: string) {
+  async addUserDialog(user: string, dialog: string) {
     const dialogFound = await this.findDialogById(dialog)
-    this.checkAddedUser(dialogFound, user)
+    const userFound = this.checkAddedUser(dialogFound, user)
+    if (userFound) return dialog
 
     await dialogFound.users.push(user);
     await dialogFound.save();
@@ -62,10 +67,15 @@ class DialogService {
     const userFound = dialog.users.find((item: string) => {
       if (item.toString() === user.toString()) return true;
     });
-    if (userFound) throw new BaseRequestError("Пользователь уже добавлен", 403);
-
+    return userFound
   }
 
+  async addUsersInDialog(dialog: IDialog, users: string[]) {
+    users.forEach(item => {
+      dialog.users.push(item)
+    })
+    await dialog.save()
+  }
 }
 
 export const dialogService = new DialogService();

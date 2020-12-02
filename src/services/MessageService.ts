@@ -5,23 +5,23 @@ import {BaseRequestError} from "../BaseRquestError";
 import {io} from "../index";
 
 interface IMessageServiceCreate {
-  dialog: string;
+  id: string;
   text: string;
   author: string;
 }
 
 class MessageService {
-  async create({author, dialog, text}: IMessageServiceCreate) {
-    const userFound = await messageService.checkDialogsUser(dialog, author);
+  async create({author, id, text}: IMessageServiceCreate) {
+    const userFound = await messageService.checkDialogsUser(id, author);
     if (!userFound)
       throw new BaseRequestError("Пользователь не состоит в диалоге!", 403);
 
-    const message = new MessageModel({dialog, text, author});
+    const message = new MessageModel({dialog: id, text, author});
     await message.save();
-
+    console.log(message)
     const user = await UserModel.findById(author);
     if (!user) throw new BaseRequestError("Пользователь не найден!", 403);
-
+    console.log({user, message})
     io.emit("SERVER:NEW_MESSAGE", {user, message});
 
 
@@ -62,7 +62,6 @@ class MessageService {
       status: 200,
       message: "Сообщения получены",
       messages,
-      dialog: dialogFound
     };
   }
 }

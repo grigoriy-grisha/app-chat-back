@@ -27,7 +27,7 @@ const DialogSchema: Schema = new Schema(
       ref: "Link"
     },
     lastMessage: {type: String},
-    protected: {type: Boolean},
+    protect: {type: Boolean, required: "protect is require"},
   },
   {
     timestamps: true
