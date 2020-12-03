@@ -1,8 +1,8 @@
-import {MessageModel} from "../models/Message";
-import {UserModel} from "../models/User";
-import {DialogModel} from "../models/Dialog";
-import {BaseRequestError} from "../BaseRquestError";
-import {io} from "../index";
+import { IMessage, MessageModel } from "../models/Message";
+import { UserModel } from "../models/User";
+import { DialogModel } from "../models/Dialog";
+import { BaseRequestError } from "../BaseRquestError";
+import { io } from "../index";
 
 interface IMessageServiceCreate {
   id: string;
@@ -11,19 +11,22 @@ interface IMessageServiceCreate {
 }
 
 class MessageService {
-  async create({author, id, text}: IMessageServiceCreate) {
+  async create({ author, id, text }: IMessageServiceCreate) {
     const userFound = await messageService.checkDialogsUser(id, author);
     if (!userFound)
       throw new BaseRequestError("Пользователь не состоит в диалоге!", 403);
 
-    const message = new MessageModel({dialog: id, text, author});
-    await message.save();
-    console.log(message)
+    const message = new MessageModel({ dialog: id, text, author });
+    await message.save().then((message: IMessage) => {
+      message.populate("dialog author", (err: any, message: IMessage) => {
+        if (err) throw new BaseRequestError("Что-то пошло не так", 500);
+        return message;
+      });
+    });
+
     const user = await UserModel.findById(author);
     if (!user) throw new BaseRequestError("Пользователь не найден!", 403);
-    console.log({user, message})
-    io.emit("SERVER:NEW_MESSAGE", {user, message});
-
+    io.to(id).emit("SERVER:NEW_MESSAGE", { user, message });
 
     return {
       status: 200,
@@ -49,13 +52,12 @@ class MessageService {
     const userInDialog = dialogFound.users.find((user: string) => {
       return user.toString() === author.toString();
     });
-    if (!userFound || !userInDialog) throw new BaseRequestError("Пользователь не найден", 404);
+    if (!userFound || !userInDialog)
+      throw new BaseRequestError("Пользователь не найден", 404);
 
-
-    const messages = await MessageModel.find({dialog: dialogId}).populate([
+    const messages = await MessageModel.find({ dialog: dialogId }).populate([
       "dialog",
-      "user",
-      "attachments",
+      "author",
     ]);
 
     return {

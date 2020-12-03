@@ -1,17 +1,16 @@
-import { LinkModel } from "../models/Link";
+import {LinkModel} from "../models/Link";
 import config from "config";
-import { BaseRequestError } from "../BaseRquestError";
+import {BaseRequestError} from "../BaseRquestError";
 
 
 class RedirectService {
   async redirect(dialogId: string) {
-    const link = await LinkModel.findOne({ dialog: dialogId });
-    console.log(link)
-    if (!link) {
+    const link = await LinkModel.findOne({dialog: dialogId});
+    if (!link)
       throw new BaseRequestError("Ссылка не найдена", 404);
-    } else {
-      return config.get("clientUrl") + "/redirect";
-    }
+
+    return config.get("clientUrl") + "/redirect";
+
   }
 }
 

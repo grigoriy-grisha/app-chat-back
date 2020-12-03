@@ -1,20 +1,23 @@
-import {DialogModel, IDialog} from "../models/Dialog";
-import {UserModel} from "../models/User";
-import {BaseRequestError} from "../BaseRquestError";
-import {userService} from "./UserService";
+import { DialogModel, IDialog } from "../models/Dialog";
+import { UserModel } from "../models/User";
+import { BaseRequestError } from "../BaseRquestError";
+import { userService } from "./UserService";
+import { IMessage, MessageModel } from "../models/Message";
+import { io } from "../index";
 
 class DialogService {
   async addUser(user: string, dialog: string, author: string) {
-    const dialogFound = await this.findDialogById(dialog)
+    const dialogFound = await this.findDialogById(dialog);
     if (dialogFound.author === author)
       throw new BaseRequestError("Вы не Можете добавлять пользователей!", 403);
 
-    this.checkAddedUser(dialogFound, user)
+    this.checkAddedUser(dialogFound, user);
 
     await dialogFound.users.push(user);
     await dialogFound.save();
 
-    const foundUser = await userService.isThereUser(user)
+    const foundUser = await userService.isThereUser(user);
+
     await userService.addDialogInUser(foundUser, dialogFound);
   }
 
@@ -25,56 +28,69 @@ class DialogService {
   }
 
   async getAll(author: string) {
-    let dialogs: IDialog[] = await DialogModel.find({protect: {$ne: true}});
-    console.log(dialogs)
-    dialogs = dialogs.filter(item => {
-      return !item.users.includes(author)
-    })
-    return {status: 200, dialogs};
+    let dialogs: IDialog[] = await DialogModel.find({ protect: { $ne: true } });
+    dialogs = dialogs.filter((item) => {
+      return !item.users.includes(author);
+    });
+    return { status: 200, dialogs };
   }
 
   async addUserToDialog(name: string, author: string, protect: boolean) {
-    const dialog = await new DialogModel({name, author, protect});
+    const dialog = await new DialogModel({ name, author, protect });
     await dialog.users.push(author);
     await dialog.save();
 
-    const foundUser = await userService.isThereUser(author)
+    const foundUser = await userService.isThereUser(author);
 
-    return {foundUser, dialog}
+    return { foundUser, dialog };
   }
 
-
   async addUserDialog(user: string, dialog: string) {
-    const dialogFound = await this.findDialogById(dialog)
-    const userFound = this.checkAddedUser(dialogFound, user)
-    if (userFound) return dialog
+    const dialogFound = await this.findDialogById(dialog);
+    const userFound = this.checkAddedUser(dialogFound, user);
+    if (userFound) return dialogFound;
 
     await dialogFound.users.push(user);
     await dialogFound.save();
 
-    const foundUser = await userService.isThereUser(user)
+    const foundUser = await userService.isThereUser(user);
+    const text = `${foundUser.fullname} join to dialog`;
+    const message = new MessageModel({
+      dialog: dialogFound._id,
+      text,
+      author: user,
+      typeMessage: 2,
+    });
+    await message.save().then((message: IMessage) => {
+      message.populate("dialog author", (err: any, message: IMessage) => {
+        if (err) throw new BaseRequestError("Что-то пошло не так", 500);
+        return message;
+      });
+    });
+
+    io.to(dialog).emit("SERVER:NEW_MESSAGE", { user, message });
     await userService.addDialogInUser(foundUser, dialogFound);
+    return dialogFound;
   }
 
   async findDialogById(id: string) {
     const dialogFound = await DialogModel.findById(id);
-
     if (!dialogFound) throw new BaseRequestError("Диалог не найден", 404);
-    return dialogFound
+    return dialogFound;
   }
 
   checkAddedUser(dialog: IDialog, user: string) {
     const userFound = dialog.users.find((item: string) => {
       if (item.toString() === user.toString()) return true;
     });
-    return userFound
+    return userFound;
   }
 
   async addUsersInDialog(dialog: IDialog, users: string[]) {
-    users.forEach(item => {
-      dialog.users.push(item)
-    })
-    await dialog.save()
+    users.forEach((item) => {
+      dialog.users.push(item);
+    });
+    await dialog.save();
   }
 }
 

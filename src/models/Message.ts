@@ -1,31 +1,33 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-
 export interface IMessage extends Document {
   user: string;
   text: string;
   dialog: string;
-  _id: string
-
+  _id: string;
 }
 
 const MessageSchema: Schema = new Schema(
   {
     author: {
       type: Schema.Types.ObjectId,
-      ref: "User"
+      ref: "User",
     },
     text: {
       type: String,
-      required: "Text is required"
+      required: "Text is required",
     },
     dialog: {
       type: Schema.Types.ObjectId,
-      ref: "Dialog"
-    }
+      ref: "Dialog",
+    },
+    typeMessage: {
+      type: Number,
+      default: 1,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 

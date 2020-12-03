@@ -1,5 +1,5 @@
 import {IUser, UserModel} from "../models/User";
-import {DialogModel, IDialog} from "../models/Dialog";
+import {IDialog} from "../models/Dialog";
 import {BaseRequestError} from "../BaseRquestError";
 
 class UserService {
@@ -24,9 +24,18 @@ class UserService {
     return foundUser
   }
 
-  async getAll() {
-    const users = await UserModel.find({});
+  async getAll(author: string) {
+    const users = await UserModel.find({_id: {$ne: author}});
     return {status: 200, users};
+  }
+
+
+  async changePassword(author: string, hashedPassword: string) {
+    const user = await UserModel.findById(author)
+    if (!user) throw new BaseRequestError("Что-то пошло не так!", 500)
+    user.password = hashedPassword
+    user.save()
+    return {message: "Пароль изменен"}
   }
 }
 
