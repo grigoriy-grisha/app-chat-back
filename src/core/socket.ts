@@ -1,10 +1,20 @@
-import socket, { Socket } from "socket.io";
+import { Socket, Server } from "socket.io";
 import http from "http";
 
-export const createSocket = (http: http.Server) => {
-  const io = socket.listen(http);
+interface ClientInterface {
+  dialogId?: string;
+  userId?: string;
+}
 
-  io.on("connection", function (socket: Socket & { dialogId?: string }) {
+export const createSocket = (http: http.Server) => {
+  const io = new Server(http, {
+    cors: {
+      origin: "http://localhost:3000",
+      methods: ["GET", "POST"],
+    },
+  });
+
+  io.on("connection", function (socket: Socket & ClientInterface) {
     socket.on("DIALOGS:JOIN", (dialogId: string) => {
       if (socket.dialogId) {
         socket.leave(socket.dialogId);

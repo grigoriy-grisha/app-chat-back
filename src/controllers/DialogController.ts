@@ -2,6 +2,7 @@ import { dialogService } from "../services/DialogService";
 import { userService } from "../services/UserService";
 import { requestDecorator } from "../requestDecorator";
 import { RequestInterface } from "../types";
+import { io } from "../index";
 
 interface BodyInterface {
   name: string;
@@ -28,8 +29,8 @@ export class DialogController {
       author,
       protect
     );
-    await userService.addDialogInUser(foundUser, dialog);
 
+    await userService.addDialogInUser(foundUser, dialog);
     await dialogService.addUsersInDialog(dialog, users);
     await userService.addDialogInUsers(users, dialog);
 

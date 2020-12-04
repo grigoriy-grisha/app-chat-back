@@ -26,7 +26,7 @@ class MessageService {
 
     const user = await UserModel.findById(author);
     if (!user) throw new BaseRequestError("Пользователь не найден!", 403);
-    io.to(id).emit("SERVER:NEW_MESSAGE", { user, message });
+    io.in(id).emit("SERVER:NEW_MESSAGE", { user, message });
 
     return {
       status: 200,

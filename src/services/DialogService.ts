@@ -48,7 +48,7 @@ class DialogService {
   async addUserDialog(user: string, dialog: string) {
     const dialogFound = await this.findDialogById(dialog);
     const userFound = this.checkAddedUser(dialogFound, user);
-    if (userFound) return dialogFound;
+    if (userFound) return { dialogWasCreated: false, dialog: dialogFound };
 
     await dialogFound.users.push(user);
     await dialogFound.save();
@@ -70,7 +70,8 @@ class DialogService {
 
     io.to(dialog).emit("SERVER:NEW_MESSAGE", { user, message });
     await userService.addDialogInUser(foundUser, dialogFound);
-    return dialogFound;
+
+    return { dialogWasCreated: true, dialog: dialogFound };
   }
 
   async findDialogById(id: string) {
