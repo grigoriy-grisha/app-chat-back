@@ -22,8 +22,8 @@ const MessageSchema: Schema = new Schema(
       ref: "Dialog",
     },
     typeMessage: {
-      type: Number,
-      default: 1,
+      type: String,
+      default: "DEFAULT_MESSAGE",
     },
   },
   {

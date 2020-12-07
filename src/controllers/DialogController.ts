@@ -2,7 +2,6 @@ import { dialogService } from "../services/DialogService";
 import { userService } from "../services/UserService";
 import { requestDecorator } from "../requestDecorator";
 import { RequestInterface } from "../types";
-import { io } from "../index";
 
 interface BodyInterface {
   name: string;

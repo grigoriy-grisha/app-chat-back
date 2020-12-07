@@ -48,7 +48,12 @@ class DialogService {
   async addUserDialog(user: string, dialog: string) {
     const dialogFound = await this.findDialogById(dialog);
     const userFound = this.checkAddedUser(dialogFound, user);
-    if (userFound) return { dialogWasCreated: false, dialog: dialogFound };
+    if (userFound)
+      return {
+        dialogWasCreated: false,
+        dialog: dialogFound,
+        typeMessage: "DEFAULT_MESSAGE",
+      };
 
     await dialogFound.users.push(user);
     await dialogFound.save();
@@ -59,7 +64,7 @@ class DialogService {
       dialog: dialogFound._id,
       text,
       author: user,
-      typeMessage: 2,
+      typeMessage: "JOIN_TO_DIALOG_MESSAGE",
     });
     await message.save().then((message: IMessage) => {
       message.populate("dialog author", (err: any, message: IMessage) => {
